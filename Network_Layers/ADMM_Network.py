@@ -56,7 +56,7 @@ class ESINetADMMLayer(nn.Module):
         self.multiple_update_layer = MultipleUpdateLayer(self.yita1,self.yita2,self.yita3)
 
         layers = []
-        #x的更新
+
         layers.append(self.re_org_layer)
         layers.append(self.addlayer)
         for i in range(4):
@@ -65,7 +65,7 @@ class ESINetADMMLayer(nn.Module):
             layers.append(self.conv2_layer)
             layers.append(self.sublayer)
         layers.append(self.multiple_update_layer)
-        #中间更新迭代部分
+
         for i in range(5):
             layers.append(self.re_update_layer)
             layers.append(self.addlayer)
