@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
             loss_S_mse = MSE(s_gen, s_real)
       
-            loss = loss_S_mse * lambda
+            loss = loss_S_mse
 
             running_loss += loss
             loss.backward()
@@ -168,9 +168,9 @@ if __name__ == '__main__':
                     s_real = torch.matmul(s_real_trans, Dic)
                     s_gen = torch.matmul(s_gen_trans, Dic)
 
-                    loss_S_mse = MSE(s_gen, s_real) * lambda2
+                    loss_S_mse = MSE(s_gen, s_real)
                 
-                    vloss = loss_S_mse * lambda
+                    vloss = loss_S_mse
 
                     running_val_loss += vloss
 
