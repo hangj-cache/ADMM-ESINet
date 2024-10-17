@@ -74,8 +74,8 @@ if __name__ == '__main__':
     L_path = "Data\\train_1024\\various conditions\L.mat"
     L = torch.tensor(loadmat(L_path)['Gain']).to("cuda").float()
 
-    lambda1 = 10
-    lambda2 = 1e4
+    #lambda1 = 10
+    lambda = 1e4
 
     delta = 0.01  # 原来0.01
     ###############################################################################
@@ -130,15 +130,12 @@ if __name__ == '__main__':
             x['B_trans'] = B_trans
             s_gen_trans = model(x)
 
-            B = torch.matmul(B_trans, Dic)
             s_real = torch.matmul(s_real_trans, Dic)
             s_gen = torch.matmul(s_gen_trans, Dic)
-            B_gen = torch.matmul(L, s_gen)
 
             loss_S_mse = MSE(s_gen, s_real)
-            loss_B_mse = MSE(B_gen, B)
-            loss_S_mae = MAE(s_gen, s_real)
-            loss = loss_S_mse * lambda2 + loss_B_mse * lambda1 + loss_S_mae * lambda2 * delta
+      
+            loss = loss_S_mse * lambda
 
             running_loss += loss
             loss.backward()
@@ -168,15 +165,12 @@ if __name__ == '__main__':
                     x = dict()
                     x['B_trans'] = B_trans
                     s_gen_trans= model(x)
-                    B = torch.matmul(B_trans, Dic)
                     s_real = torch.matmul(s_real_trans, Dic)
                     s_gen = torch.matmul(s_gen_trans, Dic)
-                    B_gen = torch.matmul(L, s_gen)
 
                     loss_S_mse = MSE(s_gen, s_real) * lambda2
-                    loss_B_mse = MSE(B_gen, B) * lambda2
-                    loss_S_mae = MAE(s_gen,s_real)
-                    vloss = loss_S_mse * lambda2 + loss_B_mse * lambda1 + loss_S_mae * lambda2 * delta
+                
+                    vloss = loss_S_mse * lambda
 
                     running_val_loss += vloss
 
