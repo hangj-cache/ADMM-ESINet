@@ -63,7 +63,7 @@ if __name__ == '__main__':
     len_train, len_test, len_validate = len(train), len(test), len(validate)
     print("len_train: ", len_train, "\tlen_test:", len_test, "\tlen_validate:", len_validate)
     train_loader = data.DataLoader(dataset=train, batch_size=args.batch_size, shuffle=True, num_workers=10,
-                                   pin_memory=False)   #上面num_workers说是建议在windows上设为0
+                                   pin_memory=False)
     test_loader = data.DataLoader(dataset=test, batch_size=args.batch_size, shuffle=True, num_workers=2,
                                   pin_memory=False)
     valid_loader = data.DataLoader(dataset=validate, batch_size=args.batch_size, shuffle=False, num_workers=2,
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     ###############################################################################
 
-    L_path = "Data\\train_1024\\various conditions\L.mat"
+    L_path = ""
     L = torch.tensor(loadmat(L_path)['Gain']).to("cuda").float()
 
     #lambda1 = 10
@@ -117,13 +117,12 @@ if __name__ == '__main__':
         last_loss = 0.0
         adjust_learning_rate(optimizer, epoch, lr=0.0001)
 
-        for batch_idx, (s_real_trans, B_trans, seedvox, Dic, ActiveVoxSeed) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
+        for batch_idx, (s_real_trans, B_trans, Dic) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
             ratio = 1
 
             s_real_trans = s_real_trans.to("cuda").float().squeeze(dim=0)
             B_trans = B_trans.to("cuda").float().squeeze(dim=0)
             Dic = Dic.to("cuda").float().squeeze(dim=0)
-            seedvox = seedvox.to("cuda").squeeze(dim=0)
 
             optimizer.zero_grad()
             x = dict()
@@ -153,13 +152,12 @@ if __name__ == '__main__':
             model.eval()
             running_val_loss = 0.0
             with torch.no_grad():
-                for batch_idx,(s_real_trans, B_trans, seedvox, Dic, ActiveVoxSeed) in tqdm(enumerate(valid_loader),desc='valid',unit='file'):
+                for batch_idx,(s_real_trans, B_trans, Dic) in tqdm(enumerate(valid_loader),desc='valid',unit='file'):
                     ratio = 1
                     # ratio = 1
                     s_real_trans = s_real_trans.to("cuda").float().squeeze(dim=0)
                     B_trans = B_trans.to("cuda").float().squeeze(dim=0)
                     Dic = Dic.to("cuda").float().squeeze(dim = 0)
-                    seedvox = seedvox.to("cuda").squeeze(dim=0)
                     # L = L.to("cuda").float().squeeze(dim=0)
 
                     x = dict()
