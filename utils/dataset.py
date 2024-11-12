@@ -18,15 +18,12 @@ class DataSet(data.Dataset):
         file_path = self.files[index]
         data = loadmat(file_path)
         s_real_trans = torch.tensor(data['s_real_trans'])
-        ActiveVoxSeed = data['ActiveVoxSeed'][0][0][0]
-        ActiveVoxSeed_new = ActiveVoxSeed.astype(np.int16)
         B_trans = torch.tensor(data['B_trans'])
         Dic = torch.tensor(data['TBFs'])
         ratio = 1
-        seedvox = data['seedvox'][0].item()
         # L = data['L']
 
-        return s_real_trans / ratio, B_trans / ratio, seedvox, Dic, ActiveVoxSeed_new
+        return s_real_trans / ratio, B_trans / ratio, Dic
 
     def __len__(self):
             return len(self.files)
