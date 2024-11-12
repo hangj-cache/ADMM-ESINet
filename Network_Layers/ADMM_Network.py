@@ -19,7 +19,7 @@ class ESINetADMMLayer(nn.Module):
         self,
         L,
         in_channels: int = 1,
-        out_channels: int = 1024,
+        out_channels: int = 256,
     ):
         """
         Args:
@@ -27,7 +27,7 @@ class ESINetADMMLayer(nn.Module):
         """
         super(ESINetADMMLayer, self).__init__()
 
-        self.rho = nn.Parameter(torch.tensor([5000.0]), requires_grad=True)  #50000
+        self.rho = nn.Parameter(torch.tensor([50000.0]), requires_grad=True)  #50000
 
         self.yita1 = nn.Parameter(torch.tensor([1.0]), requires_grad=True)
         self.yita2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
@@ -36,8 +36,8 @@ class ESINetADMMLayer(nn.Module):
         self.miu1 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
         self.miu2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
 
-        self.lam1 = nn.Parameter(torch.tensor([0.001]), requires_grad=True)
-        self.lam2 = nn.Parameter(torch.tensor([0.001]), requires_grad=True)
+        self.lam1 = nn.Parameter(torch.tensor([0.01]), requires_grad=True)
+        self.lam2 = nn.Parameter(torch.tensor([0.01]), requires_grad=True)
 
 
         # self.mask = mask
@@ -49,29 +49,36 @@ class ESINetADMMLayer(nn.Module):
         self.sublayer = sublayer(self.lam2,self.miu1,self.miu2)
 
         self.conv1_layer = convLayer1_forw(in_channels, out_channels)
+        self.conv2_1_layer = convLayer2_1_forw(out_channels, in_channels)
         self.conv2_layer = convLayer2_forw(out_channels, in_channels)
+        self.conv1_2_layer = convLayer1_2_forw(in_channels, out_channels)
+
 
         self.addlayer = addLayer()
 
         self.multiple_update_layer = MultipleUpdateLayer(self.yita1,self.yita2,self.yita3)
 
         layers = []
-
+        #x的更新
         layers.append(self.re_org_layer)
         layers.append(self.addlayer)
         for i in range(4):
             layers.append(self.conv1_layer)
+            layers.append(self.conv2_1_layer)
             layers.append(self.U_update_layer)
+            layers.append(self.conv1_2_layer)
             layers.append(self.conv2_layer)
             layers.append(self.sublayer)
         layers.append(self.multiple_update_layer)
-
+        #中间更新迭代部分
         for i in range(5):
             layers.append(self.re_update_layer)
             layers.append(self.addlayer)
             for i in range(4):
                 layers.append(self.conv1_layer)
+                layers.append(self.conv2_1_layer)
                 layers.append(self.U_update_layer)
+                layers.append(self.conv1_2_layer)
                 layers.append(self.conv2_layer)
                 layers.append(self.sublayer)
             layers.append(self.multiple_update_layer)
@@ -123,7 +130,6 @@ class ReconstructionUpdateLayer(nn.Module):
         self.L = L
 
     def forward(self, x):
-
         u = x['u']
         z = x['z']
         b = x['b']  # B
@@ -228,14 +234,46 @@ class convLayer1_forw(nn.Module):
         self.conv.weight.data.normal_(0, 0.02)
         if self.conv.bias is not None:
             self.conv.bias.data.normal_(0, 0.02)
-
+        self.bn = BatchNormalization(num_features=self.out_channels)
+        self.activation = ELUActivation()
     def forward(self, x):
         u = x['u']
-        u_hat = u.unsqueeze(dim = 0).unsqueeze(dim = 0)
+        u_hat = u.unsqueeze(dim = 1)
         a = self.conv(u_hat)
-
+        a = self.bn(a)
+        a = self.activation(a)
         output = a
-        x['vu'] = output
+        x['vu_1'] = output
+        return x
+
+
+class convLayer1_2_forw(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int):
+        super(convLayer1_2_forw,self).__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        # self.linear = nn.Linear(input_size,output_size)
+        self.conv = nn.Conv2d(in_channels=self.in_channels,
+                              out_channels=self.out_channels,
+                              kernel_size=(16,1),
+                              stride=1,
+                              padding=(8,0),
+                              dilation=1,
+                              groups=1,
+                              bias=True)
+        self.conv.weight.data.normal_(0, 0.02)
+        if self.conv.bias is not None:
+            self.conv.bias.data.normal_(0, 0.02)
+        self.bn = BatchNormalization(num_features=self.out_channels)
+        self.activation = ELUActivation()
+    def forward(self, x):
+        u = x['vu_n']
+        u_hat = u.unsqueeze(dim = 1)
+        a = self.conv(u_hat)
+        a = self.bn(a)
+        a = self.activation(a)
+        output = a
+        x['vu_n1'] = output
         return x
 
 class Conv2DTranspose(nn.Module):
@@ -264,11 +302,38 @@ class convLayer2_forw(nn.Module):
                                               stride=1,
                                               padding=(8,0)
                                               )
+        self.bn = BatchNormalization(num_features=self.out_channels)
+        self.activation = ELUActivation()
     def forward(self, x):
-        input = x['vu_n']
+        input = x['vu_n1']
         a = self.conv_transpose(input)
+        a = self.bn(a)
+        a = self.activation(a)
         output = a
-        x['vu'] = output.squeeze(dim=0).squeeze(dim=0)
+        x['vu'] = output.squeeze(dim = 1)
+        return x
+
+class convLayer2_1_forw(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int):
+        super(convLayer2_1_forw, self).__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.conv_transpose = Conv2DTranspose(in_channels=self.in_channels,
+                                              out_channels=self.out_channels,
+                                              kernel_size=(16, 1),
+                                              stride=1,
+                                              padding=(8, 0)
+                                              )
+        self.bn = BatchNormalization(num_features=self.out_channels)
+        self.activation = ELUActivation()
+
+    def forward(self, x):
+        input = x['vu_1']
+        a = self.conv_transpose(input)
+        a = self.bn(a)
+        a = self.activation(a)
+        output = a
+        x['vu_2'] = output.squeeze(dim=1)
         return x
 
 
@@ -278,9 +343,9 @@ class U_update_layer(nn.Module):
         self.lam1 = lam1
     def forward(self,x):
 
-        input = x['vu'].squeeze(dim = 0)
+        input = x['vu_2']
         output = vu_soft_thresholding_torch(input,self.lam1)
-        x['vu_n'] = output.unsqueeze(dim = 0)
+        x['vu_n'] = output
         return x
 
 
@@ -296,13 +361,14 @@ class sublayer(nn.Module):
         z = x['z']
         vu = x['vu']
         u_hat = u
-        uo = ou_soft_thresholding_torch(u_hat,self.lam2)
+        uo = vu_soft_thresholding_torch(u_hat,self.lam2)
         output = self.miu1 * u_hat + self.miu2 * (s + z) -vu -uo
         x['u'] = output
 
         return x
 
 def woodbury_inv(L, rho):
+
    LT_L = torch.matmul(L.T, L)
    rho_I = rho * torch.eye(LT_L.shape[0], device=LT_L.device)
    M = torch.add(LT_L, rho_I)
@@ -317,10 +383,4 @@ def vu_soft_thresholding_torch(y,lam):
                        y - torch.sign(y) * threshold,
                        torch.zeros_like(y))
 
-def ou_soft_thresholding_torch(y,lam):
-    row_norm = torch.norm(y,p=2,dim=1,keepdim=True)
-    threshold = lam / row_norm
-    return torch.where(torch.abs(y) > threshold,
-                       y - torch.sign(y) * threshold,
-                       torch.zeros_like(y))
 
