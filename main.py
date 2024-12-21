@@ -33,7 +33,7 @@ if __name__ == '__main__':
                         help='directory of data')
     parser.add_argument('--validation_data_dir',default='../data/training_set/data_deep_unfold')
     parser.add_argument('--batch_size', default=16, type=int, help='batch size')
-    parser.add_argument('--num_epoch', default=100, type=int, help='number of epochs')
+    parser.add_argument('--num_epoch', default=200, type=int, help='number of epochs')
     parser.add_argument('--outf', type=str, default='./logs_csnet', help='path of log files')
     parser.add_argument('--extents', type=str, default='1', help='signal noise ratio')
     parser.add_argument('--SNRs', type=str, default='5', help='signal noise ratio')
@@ -74,7 +74,6 @@ if __name__ == '__main__':
     L_path = ""
     L = torch.tensor(loadmat(L_path)['Gain']).to("cuda").float()
 
-    #lambda1 = 10
     lambda = 1e4
 
     delta = 0.01
@@ -115,7 +114,7 @@ if __name__ == '__main__':
 
         running_loss = 0.0
         last_loss = 0.0
-        adjust_learning_rate(optimizer, epoch, lr=0.0001)
+        adjust_learning_rate(optimizer, epoch, lr=0.001)
 
         for batch_idx, (s_real_trans, B_trans, Dic) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
             ratio = 1
@@ -148,7 +147,7 @@ if __name__ == '__main__':
     ###############################################################################
     # validate
     ###############################################################################
-        if epoch % 1 == 0:
+        if epoch % 5 == 0:
             model.eval()
             running_val_loss = 0.0
             with torch.no_grad():
