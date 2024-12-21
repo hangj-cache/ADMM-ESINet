@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', default='Data', type=str,
                         help='directory of data')
     parser.add_argument('--validation_data_dir',default='../data/training_set/data_deep_unfold')
-    parser.add_argument('--batch_size', default=1, type=int, help='batch size')
+    parser.add_argument('--batch_size', default=16, type=int, help='batch size')
     parser.add_argument('--num_epoch', default=100, type=int, help='number of epochs')
     parser.add_argument('--outf', type=str, default='./logs_csnet', help='path of log files')
     parser.add_argument('--extents', type=str, default='1', help='signal noise ratio')
