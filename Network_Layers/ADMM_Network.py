@@ -62,7 +62,7 @@ class ESINetADMMLayer(nn.Module):
         #x的更新
         layers.append(self.re_org_layer)
         layers.append(self.addlayer)
-        for i in range(4):
+        for i in range(2):
             layers.append(self.conv1_layer)
             layers.append(self.conv2_1_layer)
             layers.append(self.U_update_layer)
@@ -74,7 +74,7 @@ class ESINetADMMLayer(nn.Module):
         for i in range(5):
             layers.append(self.re_update_layer)
             layers.append(self.addlayer)
-            for i in range(4):
+            for i in range(2):
                 layers.append(self.conv1_layer)
                 layers.append(self.conv2_1_layer)
                 layers.append(self.U_update_layer)
