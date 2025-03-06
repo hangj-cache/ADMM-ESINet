@@ -155,7 +155,8 @@ end
 %% Iteration
 
 Eccentricity = sqrt(sum(GridLoc.^2,2));
-Ec = find(Eccentricity > 70*1e-3);
+% Ec = find(Eccentricity > 70*1e-3);
+Ec = 0;
 
 for h = 1:2
 
