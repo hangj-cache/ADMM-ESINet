@@ -19,7 +19,7 @@ class ESINetADMMLayer(nn.Module):
         self,
         L,
         in_channels: int = 1,
-        out_channels: int = 128,
+        out_channels: int = 256,
     ):
         """
         Args:
@@ -27,7 +27,7 @@ class ESINetADMMLayer(nn.Module):
         """
         super(ESINetADMMLayer, self).__init__()
 
-        self.rho = nn.Parameter(torch.tensor([50000.0]), requires_grad=True)  #50000
+        self.rho = nn.Parameter(torch.tensor([600.0]), requires_grad=True)
 
         self.yita1 = nn.Parameter(torch.tensor([1.0]), requires_grad=True)
         self.yita2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
