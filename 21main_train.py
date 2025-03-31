@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     def adjust_learning_rate(opt, epo, lr):
         """Sets the learning rate to the initial LR decayed by 5 every 50 epochs"""
-        lr = lr * (0.5 ** (epo // 20))  #original:50----每50个epoch调解一次学习率
+        lr = lr * (0.5 ** (epo // 50))  #original:50----每50个epoch调解一次学习率
         for param_group in opt.param_groups:
             param_group['lr'] = lr
 
