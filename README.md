@@ -1,3 +1,3 @@
 # ADMM-ESINet
 
-The Python code for ADMM ESINet. You need to generate EEG data for the training set. Run main to start training the model. For different training data, you need to modify the initial values of hyperparameters in the model appropriately to meet the requirements of the model.
+The Python code for ADMM ESINet. You need to launch Brainstorm and run data_generator_simulation_300 to generate EEG data for the training set (in MATLAB), while modifying the path parameters in the network. Run the 21main_trans function to start training the model. The high-resolution source imaging network has been placed under /High-resolution experimental network.
