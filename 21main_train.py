@@ -26,7 +26,7 @@ class MAELoss(nn.Module):
 if __name__ == '__main__':
 
     ###############################################################################
-    # parameters----argparse一般只要一个放在main中--要用的全部参数
+    # parameters----argparse
     ###############################################################################
     parser = argparse.ArgumentParser(description=' main ')
     # parser.add_argument('--data_dir', default='./data/training_set/data_xin_4/', type=str,
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     def adjust_learning_rate(opt, epo, lr):
         """Sets the learning rate to the initial LR decayed by 5 every 50 epochs"""
-        lr = lr * (0.5 ** (epo // 50))  #original:50----每50个epoch调解一次学习率
+        lr = lr * (0.5 ** (epo // 25))  #original:50----每50个epoch调解一次学习率
         for param_group in opt.param_groups:
             param_group['lr'] = lr
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     ###############################################################################
     # Adam optimizer
     ###############################################################################
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=3e-3, weight_decay=1e-4)
 
     ###############################################################################
     # self-define loss
@@ -119,24 +119,25 @@ if __name__ == '__main__':
 
         running_loss = 0.0
         last_loss = 0.0
-        adjust_learning_rate(optimizer, epoch, lr=0.001)  #原来是0.002----现在改成0.004试试效果
+        adjust_learning_rate(optimizer, epoch, lr=0.003)  #原来是0.002----现在改成0.004试试效果
 
         # ===================train==========================
-        for batch_idx, (B,s_real,TBFs) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
+        for batch_idx, (B_trans,s_real_trans,TBFs) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
             ratio = 1
 
-            s_real = s_real.to("cuda").float()
-            B = B.to("cuda").float()
+            s_real_trans = s_real_trans.to("cuda").float()
+            B_trans = B_trans.to("cuda").float()
             TBFs = TBFs.to("cuda").float()
 
             TBFs_tp = torch.transpose(TBFs,1,2)
 
             optimizer.zero_grad()
             x = dict()
-            x['B_trans'] = torch.bmm(B,TBFs_tp)
+            x['B_trans'] = B_trans
 
             s_gen_trans = model(x)
             s_gen = torch.bmm(s_gen_trans,TBFs)
+            s_real = torch.bmm(s_real_trans,TBFs)
 
             loss_S_mse = MSE(s_gen,s_real)
             loss = loss_S_mse * lambda2
@@ -161,20 +162,21 @@ if __name__ == '__main__':
             model.eval()
             running_val_loss = 0.0
             with torch.no_grad():
-                for batch_idx,(B,s_real,TBFs) in tqdm(enumerate(valid_loader),desc='valid',unit='file'):
+                for batch_idx,(B_trans,s_real_trans,TBFs) in tqdm(enumerate(valid_loader),desc='valid',unit='file'):
                     ratio = 1
                     # ratio = 1
-                    s_real = s_real.to("cuda").float()
-                    B = B.to("cuda").float()
+                    s_real_trans = s_real_trans.to("cuda").float()
+                    B_trans = B_trans.to("cuda").float()
                     TBFs = TBFs.to("cuda").float()
 
                     TBFs_tp = torch.transpose(TBFs,1,2)
 
                     x = dict()
 
-                    x['B_trans'] = torch.bmm(B,TBFs_tp)
+                    x['B_trans'] = B_trans
                     s_gen_trans= model(x)  # 模型对象的输入是forward的输入
                     s_gen = torch.bmm(s_gen_trans, TBFs)
+                    s_real= torch.bmm(s_real_trans,TBFs)
 
                     loss_S_mse = MSE(s_gen, s_real)
 
@@ -185,7 +187,7 @@ if __name__ == '__main__':
             avg_val_loss = running_val_loss / 200
             best_vloss = last_loss
             print('m_LOSS train {} valid {}'.format(last_loss, avg_val_loss))
-            model_path = 'plus_1024-{}-8d-4-0.001-sub01_model_{}_{}_1226.pth'.format(avg_val_loss,timestamp, epoch + 1)
+            model_path = 'plus_1024-{}-6-2-0.003-sub01_model_{}_{}_1226.pth'.format(avg_val_loss,timestamp, epoch + 1)
             torch.save(model.state_dict(), os.path.join(args.outf,args.cond,model_path))
 
 
