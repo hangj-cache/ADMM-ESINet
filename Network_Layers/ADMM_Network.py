@@ -27,7 +27,7 @@ class ESINetADMMLayer(nn.Module):
         """
         super(ESINetADMMLayer, self).__init__()
 
-        self.rho = nn.Parameter(torch.tensor([600.0]), requires_grad=True)
+        self.rho = nn.Parameter(torch.tensor([600.0]), requires_grad=False)
 
         self.yita1 = nn.Parameter(torch.tensor([1.0]), requires_grad=True)
         self.yita2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
@@ -36,8 +36,8 @@ class ESINetADMMLayer(nn.Module):
         self.miu1 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
         self.miu2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
 
-        self.lam1 = nn.Parameter(torch.tensor([0.1]), requires_grad=True)
-        self.lam2 = nn.Parameter(torch.tensor([0.1]), requires_grad=True)
+        self.lam1 = nn.Parameter(torch.tensor([0.01]), requires_grad=True)
+        self.lam2 = nn.Parameter(torch.tensor([0.01]), requires_grad=True)
 
 
         # self.mask = mask
