@@ -6,3 +6,6 @@
 The high-resolution source imaging network has been placed under the /High-resolution experimental network directory. Source imaging results are provided for different numbers of brain sources, including cases with 4006, 5006, and 6006 sources.
 
 3. The imaging results for other subjects in the Localize-MI dataset are included in the Supplement Document.
+
+
+Due to the potential differences in the amplitudes of the generated simulated data, $\lambda$ needs to be adjusted for simulated data with different amplitudes (this parameter influences the range of the subsequent sparsity threshold).
