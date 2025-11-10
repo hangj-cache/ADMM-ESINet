@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
         running_loss = 0.0
         last_loss = 0.0
-        adjust_learning_rate(optimizer, epoch, lr=0.003)  #原来是0.002----现在改成0.004试试效果
+        adjust_learning_rate(optimizer, epoch, lr=0.003)
 
         # ===================train==========================
         for batch_idx, (B_trans,s_real_trans,TBFs) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
@@ -189,6 +189,7 @@ if __name__ == '__main__':
             print('m_LOSS train {} valid {}'.format(last_loss, avg_val_loss))
             model_path = 'plus_1024-{}-6-2-0.003-sub01_model_{}_{}_1226.pth'.format(avg_val_loss,timestamp, epoch + 1)
             torch.save(model.state_dict(), os.path.join(args.outf,args.cond,model_path))
+
 
 
 
