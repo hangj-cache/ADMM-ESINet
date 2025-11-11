@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     def adjust_learning_rate(opt, epo, lr):
         """Sets the learning rate to the initial LR decayed by 5 every 50 epochs"""
-        lr = lr * (0.5 ** (epo // 25))
+        lr = lr * (0.5 ** (epo // 20))
         for param_group in opt.param_groups:
             param_group['lr'] = lr
 
@@ -71,8 +71,8 @@ if __name__ == '__main__':
     L = torch.tensor(loadmat(subject01_L_path)['L']).to("cuda").float()
 
 
-    lambda1 = 10   #original ：10
-    lambda2 = 1e5  #original :150
+    lambda1 = 10 
+    lambda2 = 1e7  
 
     delta = 0.01  #原来0.01
     ###############################################################################
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     ###############################################################################
     # Adam optimizer
     ###############################################################################
-    optimizer = torch.optim.Adam(model.parameters(), lr=3e-3, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
 
     ###############################################################################
     # self-define loss
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
         running_loss = 0.0
         last_loss = 0.0
-        adjust_learning_rate(optimizer, epoch, lr=0.003)
+        adjust_learning_rate(optimizer, epoch, lr=0.001)
 
         # ===================train==========================
         for batch_idx, (B_trans,s_real_trans,TBFs) in tqdm(enumerate(train_loader),desc='Training',unit='file'):
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     ###############################################################################
     # validate
     ###############################################################################
-        if epoch % 1 == 0:
+        if epoch > 5 and epoch % 5 == 0:
             model.eval()
             running_val_loss = 0.0
             with torch.no_grad():
@@ -187,8 +187,9 @@ if __name__ == '__main__':
             avg_val_loss = running_val_loss / 200
             best_vloss = last_loss
             print('m_LOSS train {} valid {}'.format(last_loss, avg_val_loss))
-            model_path = 'plus_1024-{}-6-2-0.003-sub01_model_{}_{}_1226.pth'.format(avg_val_loss,timestamp, epoch + 1)
+            model_path = 'plus_1024-{}-6-2-0.001-sub01_model_{}_{}_1226.pth'.format(avg_val_loss,timestamp, epoch + 1)
             torch.save(model.state_dict(), os.path.join(args.outf,args.cond,model_path))
+
 
 
 
