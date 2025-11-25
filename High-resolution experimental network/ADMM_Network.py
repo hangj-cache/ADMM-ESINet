@@ -27,7 +27,7 @@ class ESINetADMMLayer(nn.Module):
         """
         super(ESINetADMMLayer, self).__init__()
 
-        self.rho = nn.Parameter(torch.tensor([600.0]), requires_grad=False)  #50000
+        self.rho = nn.Parameter(torch.tensor([600000.0]), requires_grad=False)  #50000
 
         self.yita1 = nn.Parameter(torch.tensor([1.0]), requires_grad=True)
         self.yita2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
@@ -36,8 +36,8 @@ class ESINetADMMLayer(nn.Module):
         self.miu1 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
         self.miu2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
 
-        self.lam1 = nn.Parameter(torch.tensor([0.001]), requires_grad=True)
-        self.lam2 = nn.Parameter(torch.tensor([0.001]), requires_grad=True)
+        self.lam1 = nn.Parameter(torch.tensor([0.00001]), requires_grad=True)
+        self.lam2 = nn.Parameter(torch.tensor([0.00001]), requires_grad=True)
 
 
         # self.mask = mask
@@ -71,7 +71,7 @@ class ESINetADMMLayer(nn.Module):
             layers.append(self.sublayer)
         layers.append(self.multiple_update_layer)
         #中间更新迭代部分
-        for i in range(3):
+        for i in range(2):
             layers.append(self.re_update_layer)
             layers.append(self.addlayer)
             for i in range(2):
@@ -392,5 +392,6 @@ def vu_soft_thresholding_torch(y,lam):
 
 # def proxl1ARD(Y,lam):
 #     return torch.mul(torch.sign(Y), F.relu(torch.abs(Y) - lam))
+
 
 
