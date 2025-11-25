@@ -8,4 +8,4 @@ The high-resolution source imaging network has been placed under the /High-resol
 3. The imaging results for other subjects in the Localize-MI dataset are included in the Supplement Document.
 
 
-Due to the potential differences in the amplitudes of the generated simulated data, $\lambda$ needs to be adjusted for simulated data with different amplitudes (this parameter influences the range of the subsequent sparsity threshold).
+Due to differences in simulated data, the training performance of different types of parameters may vary. Therefore, I modified the parameters in the network to obtain a parameter configuration suitable for most simulated data.
