@@ -36,8 +36,8 @@ class ESINetADMMLayer(nn.Module):
         self.miu1 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
         self.miu2 = nn.Parameter(torch.tensor([1.0]),requires_grad=True)
 
-        self.lam1 = nn.Parameter(torch.tensor([0.0001]), requires_grad=True)
-        self.lam2 = nn.Parameter(torch.tensor([0.0001]), requires_grad=True)
+        self.lam1 = nn.Parameter(torch.tensor([0.00001]), requires_grad=True)
+        self.lam2 = nn.Parameter(torch.tensor([0.00001]), requires_grad=True)
 
 
         # self.mask = mask
@@ -392,6 +392,7 @@ def vu_soft_thresholding_torch(y,lam):
 
 # def proxl1ARD(Y,lam):
 #     return torch.mul(torch.sign(Y), F.relu(torch.abs(Y) - lam))
+
 
 
 
