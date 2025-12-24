@@ -8,4 +8,4 @@ The high-resolution source imaging network has been placed under the /High-resol
 3. The imaging results for other subjects in the Localize-MI dataset are included in the Supplement Document.
 
 
-Due to differences in simulated data, the training performance of different types of parameters may vary. Therefore, I modified the parameters in the network to obtain a parameter configuration suitable for most simulated data.
+Due to the inherent variability in simulated data, training performance tends to be sensitive to hyperparameter configurations. To ensure the model's generalizability across diverse simulated scenarios, we have refined the network parameters to achieve a robust configuration. These settings are strictly aligned with the reference parameters documented in the GitHub repository.
