@@ -158,7 +158,7 @@ if __name__ == '__main__':
     ###############################################################################
     # validate
     ###############################################################################
-        if epoch > 5 and epoch % 5 == 0:
+        if epoch > 5 and epoch % 1 == 0:
             model.eval()
             running_val_loss = 0.0
             with torch.no_grad():
@@ -189,6 +189,7 @@ if __name__ == '__main__':
             print('m_LOSS train {} valid {}'.format(last_loss, avg_val_loss))
             model_path = 'plus_1024-{}-6-2-0.001-sub01_model_{}_{}_1226.pth'.format(avg_val_loss,timestamp, epoch + 1)
             torch.save(model.state_dict(), os.path.join(args.outf,args.cond,model_path))
+
 
 
 
