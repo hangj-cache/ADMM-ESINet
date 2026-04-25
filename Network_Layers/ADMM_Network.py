@@ -376,12 +376,10 @@ def woodbury_inv(L, rho):
    result = torch.inverse(M)
    return result
 
-def vu_soft_thresholding_torch(y,lam):
-    row_norm = torch.norm(y,p=2,dim=2,keepdim=True)
-    threshold = lam / row_norm
-    return torch.where(torch.abs(y) > threshold,
-                       y - torch.sign(y) * threshold,
-                       torch.zeros_like(y))
+def vu_soft_thresholding_torch(Y,lam):
+    row_norms = torch.norm(Y, p=2, dim=-1, keepdim=True)
+    scale = torch.clamp(1 - lam / (row_norms + 1e-12), min=0)
+    return Y * scale
 
 # def ou_soft_thresholding_torch(y,lam):
 #     row_norm = torch.norm(y,p=2,dim=2,keepdim=True)
